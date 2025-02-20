@@ -28,6 +28,8 @@
 
     void printList(const Queue *q);
 
-    void walkList(const Queue *q);
+    void walkList(const Queue *q, int ordem);
+
+    void ordenaLista(struct Queue *q);
 
 #endif // NODE_H

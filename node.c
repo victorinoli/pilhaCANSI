@@ -78,46 +78,100 @@ void printList(const struct Queue *q) {
     }
 }
 
-void walkList(const struct Queue *q) {
-    struct Node *temp = q->front;
+void walkList(const struct Queue *q, int ordem) {
+    struct Node *temp;
 
-    if (temp == NULL) {
+    if (q == NULL || q->front == NULL) {
         printf("Lista vazia\n");
         return;
     }
 
-    while (temp != NULL) {
+    if (ordem == 1) {
+        temp = q->front;
+    } else if (ordem == 2) {
+        temp = q->rear;
+    } else {
+        printf("Ordem inválida! Use 1 para crescente e 2 para decrescente.\n");
+        return;
+    }
+
+    while (1) {
         printf("-----------------------------------------------------------------\n");
         printf("Nome: %s\n", temp->nome);
         printf("Sexo: %s\n", temp->sexo);
         printf("Salario: %.2f\n", temp->salario);
 
-        int i = detectArrowKeys();
+        int i = detectArrowKeys(); // Detecta teclas (0 = frente, 1 = trás)
 
-        /* Verifica se a entrada do usuário foi válida */
-        /*if (scanf("%d", &i) != 1) {
-            printf("Erro ao ler entrada.\n");
-            return;
-        }*/
-
-        /* 1 = volta, 0 = vai */
-        if (i == 0) {
-            temp = temp->next;
+        if (ordem == 1) {  // Percorrendo em ordem crescente
+            if (i == 0 && temp->next != NULL) {
+                temp = temp->next;
+            } else if (i == 1 && temp->prev != NULL) {
+                temp = temp->prev;
+            } else {
+                printf("Fim da lista.\n");
+                break;
+            }
         }
-        if (i == 1 && temp->prev != NULL) { /* Evita acessar ponteiro inválido */
-            temp = temp->prev;
+        else if (ordem == 2) {
+            if (i == 0 && temp->prev != NULL) {
+                temp = temp->prev;
+            } else if (i == 1 && temp->next != NULL) {
+                temp = temp->next;
+            } else {
+                printf("Fim da lista.\n");
+                break;
+            }
         }
     }
 }
 
-void ordenaArray(struct Queue *q) {
-    struct Node *temp = q->front;
 
-    if (temp == NULL) {
-        printf("Lista vazia\n");
-        return;
-    } else {
-        /* Implementação futura */
+void ordenaLista(struct Queue *q) {
+    if (q->front == NULL || q->front->next == NULL) {
+        printf("Lista vazia ou com apenas um elemento.\n");
         return;
     }
+
+    int trocou;
+    struct Node *atual;
+    struct Node *ultimo = NULL;
+
+    do {
+        trocou = 0;
+        atual = q->front;
+
+        while (atual->next != ultimo) {
+            if (strcmp(atual->nome, atual->next->nome) > 0) {
+
+                struct Node *proximo = atual->next;
+                struct Node *anterior = atual->prev;
+
+                atual->next = proximo->next;
+                if (proximo->next != NULL) {
+                    proximo->next->prev = atual;
+                }
+
+                proximo->prev = anterior;
+                proximo->next = atual;
+                atual->prev = proximo;
+
+                if (anterior != NULL) {
+                    anterior->next = proximo;
+                } else {
+                    q->front = proximo;
+                }
+
+                if (atual->next == NULL) {
+                    q->rear = atual;
+                }
+
+                trocou = 1;
+            } else {
+                atual = atual->next;
+            }
+        }
+        ultimo = atual;
+    } while (trocou);
 }
+
